@@ -39,6 +39,30 @@ const html = tpl`
 document.body.innerHTML = html.render(data);
 ```
 
+### 嵌套模板
+
+```javascript
+const header = tpl`
+  <h1>${tpl.print(ctx => ctx.title)}</h1>
+`;
+
+const html = tpl`
+${header}
+<div>
+  <p>${tpl.print(ctx => ctx.content)}</p>
+</div>
+<footer>
+  ${tpl.print(ctx => ctx.footer)}
+</footer>
+`;
+
+document.body.innerHTML = html.render({
+  title: 'Hello, World!',
+  content: 'This is a tiny-tpl example.',
+  footer: 'footer',
+});
+```
+
 ## API
 
 ### tpl\`...\`
