@@ -29,25 +29,3 @@ tpl.print = function <T>(resolve: (ctx: T) => string | ITpl<T>): ITpl<T> {
     },
   };
 };
-
-// type ICtx = {
-//   title: string;
-// };
-
-// const a = tpl<ICtx>`
-// const a = 1;
-
-// ${tpl.print(ctx => ctx.title)}
-// ${tpl.print(ctx => (ctx.title.startsWith('a') ? ctx.title : ''))}
-// `;
-
-// const b = tpl`
-// this is b
-
-// ${a}
-
-// ${Object.keys({ a: 1, b: 2 }).map(k => tpl.print<ICtx>(ctx => `${ctx.title} >>> key=${k};\n`))}
-
-// `;
-
-// b.render({ title: 'xxx' });
