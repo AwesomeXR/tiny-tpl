@@ -10,6 +10,11 @@ it('print', () => {
   expect(p.render('test')).toBe('print test');
 });
 
+it('function resolver', () => {
+  const f = tpl<number>`print ${ctx => ctx + ''}`;
+  expect(f.render(1)).toBe('print 1');
+});
+
 it('nested', () => {
   const a = tpl<void>`a`;
   const b = tpl`b ${a}`;
