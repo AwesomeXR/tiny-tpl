@@ -1,48 +1,46 @@
 import { tpl } from '../src';
 
-it('static', () => {
-  const s = tpl<void>`somethings`;
-  expect(s.render()).toBe('somethings');
+beforeEach(() => {
+  tpl.files.clear();
+});
+
+it('if-else-endif', () => {
+  const render = tpl.compile('a ${ _if`num === 1` }true${ _else }false${ _endif }');
+
+  const s1 = render({ num: 1 });
+  const s2 = render({ num: 2 });
+
+  expect(s1).toEqual('a true');
+  expect(s2).toEqual('a false');
+});
+
+it('if-elseif-else-endif', () => {
+  const render = tpl.compile('test ${ _if`num === 1` }A${ _elseif`num === 2` }B${ _else }C${ _endif }');
+
+  const s1 = render({ num: 1 });
+  const s2 = render({ num: 2 });
+  const s3 = render({ num: 3 });
+
+  expect(s1).toEqual('test A');
+  expect(s2).toEqual('test B');
+  expect(s3).toEqual('test C');
+});
+
+it('for-endfor', () => {
+  const render = tpl.compile('a ${ _for`index, name in names` }n-${_`name`}, ${ _endfor }');
+  const s1 = render({ names: ['a', 'b', 'c'] });
+  expect(s1).toEqual('a n-a, n-b, n-c, ');
 });
 
 it('print', () => {
-  const p = tpl.print<string>(ctx => `print ${ctx}`);
-  expect(p.render('test')).toBe('print test');
+  const s1 = tpl.compile('nick:${_`name`}, age:${_`age`}, next_age:${_`age + 1`}, say-hi:${_`"hi" + name`}')({ name: 'Jam', age: 18 });
+  expect(s1).toEqual('nick:Jam, age:18, next_age:19, say-hi:hiJam');
 });
 
-it('function resolver', () => {
-  const f = tpl<number>`print ${ctx => ctx + ''}`;
-  expect(f.render(1)).toBe('print 1');
-});
+it('include', () => {
+  tpl.files.set('logo.txt', 'LOGO');
+  tpl.files.set('header.txt', '[THIS IS HEADER, title=${ _`title` }, logo=${ _include`logo.txt` }]');
 
-it('nested', () => {
-  const a = tpl<void>`a`;
-  const b = tpl`b ${a}`;
-  expect(b.render()).toBe('b a');
-});
-
-it('nested nested', () => {
-  const a = tpl<void>`a`;
-  const b = tpl`b ${a}`;
-  const c = tpl`c ${b}`;
-  expect(c.render()).toBe('c b a');
-});
-
-it('nested print', () => {
-  const a = tpl.print<string>(ctx => `print ${ctx}`);
-  const b = tpl`b ${a}`;
-  expect(b.render('test')).toBe('b print test');
-});
-
-it('nested print array', () => {
-  const a = tpl.print<string>(ctx => `print ${ctx}`);
-  const b = tpl`b ${[a, a]} ${a}`;
-  expect(b.render('test')).toBe('b print testprint test print test');
-});
-
-it('if', () => {
-  const a = tpl.print<string>(ctx => (ctx.startsWith('a') ? ctx : ''));
-  const b = tpl`b ${a}`;
-  expect(b.render('test')).toBe('b ');
-  expect(b.render('a')).toBe('b a');
+  const s1 = tpl.compile('${ _include`header.txt { title }` }-b, ${ _`desc` }')({ title: 'Dog', desc: 'dog site' });
+  expect(s1).toEqual('[THIS IS HEADER, title=Dog, logo=LOGO]-b, dog site');
 });
